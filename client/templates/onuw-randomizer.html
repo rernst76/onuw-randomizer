@@ -1,0 +1,40 @@
+<head>
+  <title>onuw-randomizer</title>
+</head>
+
+<body>
+  <div class="container">
+    <h1>One Night Ultimate Randomizer</h1>
+    <h3>Which sets are you using?</h3>
+    {{> setList}}
+    <h3>How many players?</h3>
+    <div class="row">
+      <div class="col s6">
+        <p class="range-field">
+          <input type="range" id="numPlayers" min="0" max="10" />
+        </p>
+      </div>
+    </div>
+    {{> randomize}}
+    {{> results}}
+  </div>
+</body>
+
+<template name="randomize">
+  <button class="waves-effect waves-light btn" id="doRandomize">Randomize</button>
+</template>
+
+<template name="setList">
+  <ul class="collection">
+    {{#each gameSets}}
+      <li class="collection-item">
+        <input type="checkbox" id="{{_id}}" />
+        <label for="{{_id}}">{{name}}</label>
+      </li>
+    {{/each}}
+  </ul>
+</template>
+
+<template name="results">
+  <h3>Results</h3>
+</template>

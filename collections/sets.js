@@ -1,0 +1,1 @@
+Sets = new Mongo.Collection('sets');
