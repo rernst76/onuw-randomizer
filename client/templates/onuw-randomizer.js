@@ -6,12 +6,19 @@
   
   Template.results.created = function() {
   // Create local collection to store randomized result
-  Workout = new Mongo.Collection(null);
+  randomSet = new Mongo.Collection(null);
+};
+
+Array.prototype.randomElement = function () {
+    var randIndex;
+    randIndex = Math.floor(Math.random() * this.length);
+    return this.splice(randIndex)[0];
 };
 
 Template.randomize.events({
   'click #doRandomize': function(event, template) {
     var numPlayers = $("#numPlayers").val();
+    var numWolves  = $("#numWolves").val();
 
     // Get all sets that are checked
     var sets = [];
@@ -24,11 +31,29 @@ Template.randomize.events({
     
     // Now that we have all the sets, lets get all of the cards
     var cards = [];
-    _.each(sets, function(element, index, list) {
+    _.each(sets, function(element) {
     $.merge(cards, Sets.findOne({_id: element}).cards);
     });
     
+    // Filter out villager and werewolf roles
+    var werewolves = [];
+    var villagers = [];
+    werewolves = _.filter(cards, function(card) {return card.team === "werewolf";});
+    villagers  = _.filter(cards, function(card) {return card.team === "villager";});
     
-    console.log(cards);
+    // Get random werewolf cards
+    var randomSet = [];
+    
+    
+    $.merge(randomSet, _.sample(werewolves, numWolves));
+    numPlayers -= numWolves;
+    
+    // Check to see if we have an alpha-wolf, if so add another wolf
+    if (_.some(randomSet, function(elem) {return elem.name === "Alpha Wolf";})) {
+      randomSet.push(_.sample(_.difference(werewolves, randomSet), 1)[0]);
+    }
+    
+    console.log(numPlayers);
+    console.log(randomSet);
   }
 });
