@@ -1,12 +1,18 @@
-  Template.setList.helpers({
+Template.setList.helpers({
     gameSets: function() {
       return Sets.find();
     }
-  });
+});
   
-  Template.results.created = function() {
+Template.results.helpers({
+  randomCards: function() {
+    return roleSet.find();
+  }
+});
+  
+Template.results.created = function() {
   // Create local collection to store randomized result
-  randomSet = new Mongo.Collection(null);
+  roleSet = new Mongo.Collection(null);
 };
 
 Array.prototype.randomElement = function () {
@@ -17,8 +23,12 @@ Array.prototype.randomElement = function () {
 
 Template.randomize.events({
   'click #doRandomize': function(event, template) {
-    var numPlayers = $("#numPlayers").val();
-    var numWolves  = $("#numWolves").val();
+    var numPlayers = parseInt($("#numPlayers").val(),10);
+    var numWolves  = parseInt($("#numWolves").val(),10);
+    numPlayers = numPlayers + 3;
+    
+    // Empty existing set in collection
+    roleSet.remove({});
 
     // Get all sets that are checked
     var sets = [];
@@ -43,8 +53,6 @@ Template.randomize.events({
     
     // Get random werewolf cards
     var randomSet = [];
-    
-    
     $.merge(randomSet, _.sample(werewolves, numWolves));
     numPlayers -= numWolves;
     
@@ -52,6 +60,15 @@ Template.randomize.events({
     if (_.some(randomSet, function(elem) {return elem.name === "Alpha Wolf";})) {
       randomSet.push(_.sample(_.difference(werewolves, randomSet), 1)[0]);
     }
+    
+    // Get remaining villager cards
+    $.merge(randomSet, _.sample(villagers, numPlayers));
+    
+    // Add to roleSet local collection
+    _.each(randomSet, function(elem){
+      roleSet.insert(elem);
+    });
+    
     
     console.log(numPlayers);
     console.log(randomSet);

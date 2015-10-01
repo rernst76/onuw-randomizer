@@ -45,4 +45,9 @@
 
 <template name="results">
   <h3>Results</h3>
+  <ul class="collection">
+    {{#each randomCards}}
+      <li class="collection-item">{{name}}</li>
+    {{/each}}
+  </ul>
 </template>
