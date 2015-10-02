@@ -64,13 +64,20 @@ Template.randomize.events({
     // Get remaining villager cards
     $.merge(randomSet, _.sample(villagers, numPlayers));
     
+    // Check to see if we have a single mason, if so, give him a friend
+    if (_.reduce(randomSet, function(memo, card){return memo + (card.name === "Mason" ? 1 : 0);},0) === 1) {
+      // Villager to replace with a mason
+      var sacrificialVillager = _.find(randomSet, function(card){
+        return (card.team === "villager" && card.name !== "Mason");
+      });
+      console.log(sacrificialVillager);
+      
+      randomSet.splice(_.indexOf(randomSet, sacrificialVillager), 1, {name: "Mason", team: "villager"});
+    }
+    
     // Add to roleSet local collection
     _.each(randomSet, function(elem){
       roleSet.insert(elem);
     });
-    
-    
-    console.log(numPlayers);
-    console.log(randomSet);
   }
 });
